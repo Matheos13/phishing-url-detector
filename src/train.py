@@ -10,7 +10,7 @@ df = df.rename(columns={"URL": "url", "Label": "label"})
 df["label"] = df["label"].map({"good": 0, "bad": 1})
 df = df.dropna().drop_duplicates(subset="url")
 
-
+# Use a sample so training is quick (raise or remove 50_000 later)
 df = df.sample(n=min(50_000, len(df)), random_state=42)
 
 print("Extracting features...")
@@ -20,7 +20,8 @@ y = df["label"].values
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.2, random_state=42, stratify=y)
 
-model = RandomForestClassifier(n_estimators=200, random_state=42, n_jobs=-1)
+model = RandomForestClassifier(
+    n_estimators=200, random_state=42, n_jobs=-1, class_weight="balanced")
 model.fit(X_train, y_train)
 
 preds = model.predict(X_test)
