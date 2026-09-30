@@ -4,8 +4,25 @@ from urllib.parse import urlparse
 
 SUSPICIOUS_WORDS = ["login", "verify", "secure", "update", "account", "bank", "confirm", "paypal", "signin"]
 IP_PATTERN = re.compile(r"^\d{1,3}(\.\d{1,3}){3}$")
+import csv
+from pathlib import Path
+
+TOP_PATH = Path(__file__).resolve().parent.parent / "data" / "top-domains.csv"
+TOP_DOMAINS = set()
+if TOP_PATH.exists():
+    with open(TOP_PATH) as f:
+        for i, row in enumerate(csv.reader(f)):
+            if i >= 100_000:          # top 100k sites
+                break
+            TOP_DOMAINS.add(row[1].lower())
+def normalize(url: str) -> str:
+    url = str(url).strip()
+    url = re.sub(r"^[a-zA-Z]+://", "", url)   # drop http:// or https://
+    if "/" not in url:
+        url += "/"                             # dataset URLs almost always have a slash
+    return url
 def extract_features(url: str) -> dict:
-    url = str(url)
+    url = normalize(url)
     try:
         parsed = urlparse(url if "://" in url else "http://" + url)
         host = parsed.netloc.split(":")[0]
@@ -28,8 +45,8 @@ def extract_features(url: str) -> dict:
         "has_ip": int(bool(IP_PATTERN.match(host))),
         "uses_https": int(scheme == "https"),
         "num_suspicious_words": sum(w in url.lower() for w in SUSPICIOUS_WORDS),
-        "path_length": len(path),
+                "path_length": len(path),
         "num_params": url.count("&") + (1 if "?" in url else 0),
+        "is_top_domain": int(f"{ext.domain}.{ext.suffix}".lower() in TOP_DOMAINS),
     }
-
     
