@@ -27,7 +27,24 @@ python app.py         # open http://127.0.0.1:5000
 ```
 
 ## Results
-(table and report from above)
+Trained on 50,000 URLs (80/20 split):
+
+| Version | Phishing recall | Phishing precision | F1 |
+|---|---|---|---|
+| Baseline random forest | 0.65 | 0.79 | 0.71 |
+| + balanced class weights | 0.74 | 0.65 | 0.69 |
+| + top-domain feature (Tranco) | **0.80** | 0.69 | **0.74** |
+
+Final model:
+
+```
+              precision    recall  f1-score   support
+
+        good       0.94      0.90      0.92      7755
+         bad       0.69      0.80      0.74      2245
+
+    accuracy                           0.87     10000
+```
 
 ## What I learned / limitations
 - The dataset had a formatting bias: nearly all "good" URLs ended with a slash,
