@@ -35,8 +35,19 @@ def test_normalize(raw, expected):
     assert normalize(raw) == expected
 
 
-def test_same_url_with_and_without_scheme_gives_same_features():
-    assert extract_features("https://example.com/x") == extract_features("example.com/x")
+def test_uses_https_reads_the_original_scheme():
+    assert extract_features("https://example.com/x")["uses_https"] == 1
+    assert extract_features("HTTPS://example.com/x")["uses_https"] == 1
+    assert extract_features("http://example.com/x")["uses_https"] == 0
+    assert extract_features("example.com/x")["uses_https"] == 0
+
+
+def test_scheme_only_changes_uses_https():
+    with_scheme = extract_features("https://example.com/x")
+    without = extract_features("example.com/x")
+    with_scheme.pop("uses_https")
+    without.pop("uses_https")
+    assert with_scheme == without
 
 
 # --- extract_features ------------------------------------------------------
