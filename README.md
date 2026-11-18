@@ -1,5 +1,7 @@
 # Phishing URL Detector
 
+[![tests](https://github.com/Matheos13/phishing-url-detector/actions/workflows/tests.yml/badge.svg)](https://github.com/Matheos13/phishing-url-detector/actions/workflows/tests.yml)
+
 A machine-learning tool that scores a URL as likely phishing or likely safe,
 using only the text of the URL (the page is never visited).
 
@@ -25,6 +27,13 @@ Download the datasets (not included because of size) into `data/`:
 python src/train.py   # trains and saves model.joblib
 python app.py         # open http://127.0.0.1:5000
 ```
+
+## Tests
+```bash
+pip install pytest
+pytest
+```
+The tests use a small fake model, so they run without the dataset or a trained `model.joblib`.
 
 ## Results
 Trained on 50,000 URLs (80/20 split):
