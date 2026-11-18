@@ -60,5 +60,6 @@ Final model:
   so the model treated a missing slash as a sign of phishing. Normalising URLs fixed it.
 - URL text alone can't say a site is trustworthy, so I added a top-domain
   feature from the Tranco list, which stopped well-known sites being flagged.
+- The uses_https feature was always 0 at first, because the scheme was stripped before it was checked. Writing tests caught it; it is now read from the raw URL. The results above are from before the fix.
 - Phishing pages on legitimate hosts (e.g. shared platforms) can still slip through.
 - Educational tool, not a replacement for real security software.
