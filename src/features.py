@@ -22,14 +22,16 @@ def normalize(url: str) -> str:
         url += "/"                             # dataset URLs almost always have a slash
     return url
 def extract_features(url: str) -> dict:
+    # Check the scheme on the raw URL: normalize() strips it, so checking
+    # after normalizing made uses_https always 0.
+    uses_https = int(str(url).strip().lower().startswith("https://"))
     url = normalize(url)
     try:
         parsed = urlparse(url if "://" in url else "http://" + url)
         host = parsed.netloc.split(":")[0]
-        scheme, path = parsed.scheme, parsed.path
+        path = parsed.path
     except ValueError:
         # Malformed URL (e.g. stray "[") - fall back to simple string handling
-        scheme = "https" if url.startswith("https") else "http"
         host = url.split("/")[0]
         path = url[len(host):]
     ext = tldextract.extract(url)
@@ -43,7 +45,7 @@ def extract_features(url: str) -> dict:
         "num_subdomains": len(ext.subdomain.split(".")) if ext.subdomain else 0,
         "has_at": int("@" in url),
         "has_ip": int(bool(IP_PATTERN.match(host))),
-        "uses_https": int(scheme == "https"),
+        "uses_https": uses_https,
         "num_suspicious_words": sum(w in url.lower() for w in SUSPICIOUS_WORDS),
                 "path_length": len(path),
         "num_params": url.count("&") + (1 if "?" in url else 0),
